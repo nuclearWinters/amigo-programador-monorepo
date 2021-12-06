@@ -14,12 +14,6 @@ import AppQuery, {
   AppQuery as AppQueryType,
 } from "./__generated__/AppQuery.graphql";
 
-export interface IJWT {
-  _id: string;
-  iat: number;
-  exp: number;
-}
-
 export const tokensAndData: {
   refetchUser: () => void;
   accessToken: string | undefined;

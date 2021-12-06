@@ -1,6 +1,10 @@
+import { Variables } from "relay-runtime";
 import { tokensAndData } from "./App";
 
-async function fetchGraphQL(text: string, variables?: any) {
+const fetchGraphQL = async (
+  text: string | null | undefined,
+  variables: Variables
+) => {
   const response = await fetch("http://0.0.0.0:4000/graphql", {
     method: "POST",
     credentials: "include",
@@ -17,6 +21,6 @@ async function fetchGraphQL(text: string, variables?: any) {
   });
 
   return await response.json();
-}
+};
 
 export default fetchGraphQL;
