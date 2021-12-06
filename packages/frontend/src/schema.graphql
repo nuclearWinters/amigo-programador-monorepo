@@ -1,0 +1,238 @@
+input SignInInput {
+  password: String!
+  email: String!
+  clientMutationId: String
+}
+
+type SignInPayload {
+  error: String
+  accessToken: String!
+  clientMutationId: String
+}
+
+input SignUpInput {
+  password: String!
+  email: String!
+  clientMutationId: String
+}
+
+type SignUpPayload {
+  error: String!
+  accessToken: String!
+  clientMutationId: String
+}
+
+input AddCommentInput {
+  comment: String!
+  module_gid: ID!
+  user_gid: ID!
+  user_username: String!
+  clientMutationId: String
+}
+
+type AddCommentPayload {
+  error: String!
+  comment_edge: CommentEdge
+  accessToken: String!
+  clientMutationId: String
+}
+
+input AddReplyInput {
+  reply: String!
+  comment_gid: ID!
+  user_gid: ID!
+  user_username: String!
+  clientMutationId: String
+}
+
+type AddReplyPayload {
+  error: String!
+  reply_edge: ReplyEdge
+  accessToken: String!
+  clientMutationId: String
+}
+
+input UpdateDefaultModuleInput {
+  user_gid: ID!
+  module_gid: ID!
+  technology_gid: ID!
+  clientMutationId: String
+}
+
+type UpdateDefaultModulePayload {
+  error: String!
+  accessToken: String!
+  coursedModule: Coursed!
+  clientMutationId: String
+}
+
+input UpdateDefaultTechnologyInput {
+  user_gid: ID!
+  technology_gid: ID!
+  clientMutationId: String
+}
+
+type UpdateDefaultTechnologyPayload {
+  error: String!
+  accessToken: String!
+  user: User!
+  clientMutationId: String
+}
+
+input LogOutInput {
+  clientMutationId: String
+}
+
+type LogOutPayload {
+  error: String!
+}
+
+type Mutation {
+  signIn(input: SignInInput!): SignInPayload!
+  signUp(input: SignUpInput!): SignUpPayload!
+  addComment(input: AddCommentInput!): AddCommentPayload!
+  addReply(input: AddReplyInput!): AddReplyPayload!
+  updateDefaultModule(
+    input: UpdateDefaultModuleInput!
+  ): UpdateDefaultModulePayload!
+  updateDefaultTechnology(
+    input: UpdateDefaultTechnologyInput!
+  ): UpdateDefaultTechnologyPayload!
+  logOut(input: LogOutInput!): LogOutPayload!
+}
+
+type Query {
+  user: User!
+  node(id: ID!): Node
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Technology {
+  id: ID!
+  title: String!
+  total: Int!
+  order: Int!
+  default_module_gid: ID!
+}
+
+interface Node {
+  id: ID!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type Comment implements Node {
+  id: ID!
+  module_gid: ID!
+  likes: Int!
+  text: String!
+  user_gid: ID!
+  user_username: String!
+  created_at: Date
+  updated_at: Date
+  replies(after: String, first: Int, before: String, last: Int): ReplyConnection
+}
+
+type CommentConnection {
+  pageInfo: PageInfo!
+  edges: [CommentEdge]
+}
+
+type CommentEdge {
+  node: Comment
+  cursor: String!
+}
+
+type Coursed {
+  id: ID!
+  technology_gid: ID!
+  default_module_gid: ID!
+  user_gid: ID!
+  total: Int!
+}
+
+type User implements Node {
+  id: ID!
+  username: String!
+  coursed: [Coursed!]!
+  email: String!
+  module(module_gid: ID): Module!
+  technologies: [Technology!]!
+  playlist(technology_gid: ID): [Playlist!]!
+  coursing(technology_gid: ID): [Coursing!]!
+  default_technology_gid: ID!
+}
+
+type Playlist {
+  id: ID!
+  title: String!
+  thumbnail: String!
+  duration: String!
+  order: Int!
+  technology_gid: ID!
+  module_gid: ID!
+}
+
+type Module implements Node {
+  id: ID!
+  title: String!
+  date: Date!
+  duration: String!
+  comments(
+    after: String
+    first: Int
+    before: String
+    last: Int
+  ): CommentConnection
+  likes: [Like!]!
+}
+
+type Reply implements Node {
+  id: ID!
+  comment_gid: ID!
+  likes: Int!
+  text: String!
+  user_gid: ID!
+  user_username: String!
+  created_at: Date
+  updated_at: Date
+}
+
+type ReplyConnection {
+  pageInfo: PageInfo!
+  edges: [ReplyEdge]
+}
+
+type ReplyEdge {
+  node: Reply
+  cursor: String!
+}
+
+type Like {
+  id: ID!
+  comment_gid: ID!
+  user_gid: ID!
+  status: Boolean!
+  created_at: Date!
+  updated_at: Date!
+}
+
+type Coursing {
+  id: ID!
+  module_gid: ID!
+  user_gid: ID!
+  technology_gid: ID!
+  progress: String!
+  completed: Int!
+}
+
+scalar Date

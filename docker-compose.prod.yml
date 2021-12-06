@@ -1,0 +1,16 @@
+version: "3"
+services:
+  backend:
+    container_name: backend
+    image: node:14
+    volumes:
+      - .:/usr/src/service
+    working_dir: /usr/src/service/packages/backend
+    command: ["npm", "run", "serve"]
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGO_DB
+      - ACCESSSECRET
+      - REFRESHSECRET
+      - REDIS

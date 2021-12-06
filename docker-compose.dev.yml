@@ -1,0 +1,43 @@
+version: "3"
+services:
+  backend:
+    container_name: backend
+    image: node:14
+    volumes:
+      - .:/usr/src/service
+    working_dir: /usr/src/service/packages/backend
+    command: ["npm", "run", "start"]
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongo-courses
+      - redis-courses
+  frontend:
+    container_name: frontend
+    image: node:14
+    volumes:
+      - .:/usr/src/service
+    working_dir: /usr/src/service/packages/frontend
+    command: ["npm", "run", "start"]
+    ports:
+      - "3000:3000"
+  mongo-courses:
+    container_name: mongo-courses
+    image: mongo
+    volumes:
+      - ./mongo-db:/data/db
+    ports:
+      - "27017:27017"
+    logging:
+      driver: none
+    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
+  redis-courses:
+    container_name: redis-courses
+    command: redis-server --appendonly yes
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-db:/data
+    logging:
+      driver: none
