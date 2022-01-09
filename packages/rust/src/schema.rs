@@ -59,7 +59,6 @@ impl Query {
 }
 
 #[derive(GraphQLInputObject)]
-#[graphql(description = "A humanoid creature in the Star Wars universe")]
 struct SignInInput {
     password: String,
     email: String,
@@ -68,7 +67,7 @@ struct SignInInput {
 #[derive(GraphQLObject)]
 pub struct SignInPayload {
   error: String,
-  accessToken: String,
+  access_token: String,
 }
 
 pub struct Mutation;
@@ -78,7 +77,7 @@ impl Mutation {
   async fn signIn<'a>(&self, input: SignInInput, context: &'a Context) -> Result<Option<SignInPayload>, FieldError> {
     let filter = doc! { "email": input.email };
     let user = context.users.find_one(filter, None).await?.expect("Missing 'User' document.");
-    let valid = verify(input.password, &user.password)?;
+    let _valid = verify(input.password, &user.password)?;
     let key_access = ACCESSSECRET.as_bytes();
     let key_refresh = REFRESHSECRET.as_bytes();
     let start = SystemTime::now();
@@ -102,7 +101,7 @@ impl Mutation {
     *new_cookie = token_refresh;
     let result = SignInPayload {
       error: "".to_owned(),
-      accessToken: token_access,
+      access_token: token_access,
     };
     Ok(Some(result))
   }

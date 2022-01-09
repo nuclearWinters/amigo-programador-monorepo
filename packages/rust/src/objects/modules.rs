@@ -59,11 +59,11 @@ impl Module {
       let edges: Vec<Option<CommentEdge>> = Vec::new();
       return Ok(CommentConnection {
         edges: Some(edges),
-        pageInfo: PageInfo {
-          hasNextPage: false,
-          hasPreviousPage: false,
-          startCursor: None,
-          endCursor: None,
+        page_info: PageInfo {
+          has_next_page: false,
+          has_previous_page: false,
+          start_cursor: None,
+          end_cursor: None,
         },
       })
     }
@@ -107,11 +107,11 @@ impl Module {
     let end_cursor = if length == 0 { Some((&edges[length - 1].as_ref().unwrap().cursor).to_owned()) } else { None };
     let comment_connection = CommentConnection {
       edges: Some(edges),
-      pageInfo: PageInfo {
-        hasNextPage: length as i32 > first_unwrapped,
-        hasPreviousPage: false,
-        startCursor: start_cursor,
-        endCursor: end_cursor,
+      page_info: PageInfo {
+        has_next_page: length as i32 > first_unwrapped,
+        has_previous_page: false,
+        start_cursor: start_cursor,
+        end_cursor: end_cursor,
       },
     };
     Ok(comment_connection)

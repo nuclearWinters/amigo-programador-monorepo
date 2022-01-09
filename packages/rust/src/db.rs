@@ -142,10 +142,10 @@ where
 
 #[derive(GraphQLObject)]
 pub struct PageInfo {
-  pub hasNextPage: bool,
-  pub hasPreviousPage: bool,
-  pub startCursor: Option<String>,
-  pub endCursor: Option<String>,
+  pub has_next_page: bool,
+  pub has_previous_page: bool,
+  pub start_cursor: Option<String>,
+  pub end_cursor: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

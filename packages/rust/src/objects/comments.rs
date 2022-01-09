@@ -66,11 +66,11 @@ impl Comment {
       let edges: Vec<Option<ReplyEdge>> = Vec::new();
       return Ok(ReplyConnection {
         edges: Some(edges),
-        pageInfo: PageInfo {
-          hasNextPage: false,
-          hasPreviousPage: false,
-          startCursor: None,
-          endCursor: None,
+        page_info: PageInfo {
+          has_next_page: false,
+          has_previous_page: false,
+          start_cursor: None,
+          end_cursor: None,
         },
       })
     }
@@ -114,11 +114,11 @@ impl Comment {
     let end_cursor = if length == 0 { Some((&edges[length - 1].as_ref().unwrap().cursor).to_owned()) } else { None };
     let reply_connection = ReplyConnection {
       edges: Some(edges),
-      pageInfo: PageInfo {
-        hasNextPage: length as i32 > first_unwrapped,
-        hasPreviousPage: false,
-        startCursor: start_cursor,
-        endCursor: end_cursor,
+      page_info: PageInfo {
+        has_next_page: length as i32 > first_unwrapped,
+        has_previous_page: false,
+        start_cursor: start_cursor,
+        end_cursor: end_cursor,
       },
     };
     Ok(reply_connection)
@@ -141,14 +141,14 @@ impl CommentEdge {
 }
 
 pub struct CommentConnection {
-  pub pageInfo: PageInfo,
+  pub page_info: PageInfo,
   pub edges: Option<Vec<Option<CommentEdge>>>
 }
 
 #[graphql_object(context = Context)]
 impl CommentConnection {
   fn pageInfo(&self) -> &PageInfo {
-    return &self.pageInfo;
+    return &self.page_info;
   }
   fn edges(&self) -> &Option<Vec<Option<CommentEdge>>> {
     return &self.edges;

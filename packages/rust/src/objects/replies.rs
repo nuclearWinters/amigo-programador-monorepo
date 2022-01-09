@@ -62,6 +62,6 @@ pub struct ReplyEdge {
 
 #[derive(GraphQLObject)]
 pub struct ReplyConnection {
-  pub pageInfo: PageInfo,
+  pub page_info: PageInfo,
   pub edges: Option<Vec<Option<ReplyEdge>>>
 }
