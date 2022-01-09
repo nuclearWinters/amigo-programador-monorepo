@@ -10,10 +10,10 @@ use relay_rust::objects::likes::Like;
 use relay_rust::objects::playlists::Playlist;
 use relay_rust::objects::coursings::Coursing;
 use mongodb::{bson::{doc, oid::ObjectId}};
-use bcrypt::{verify};
+use bcrypt::{verify, hash, DEFAULT_COST};
 use jsonwebtoken::{encode, Header, EncodingKey};
 use std::time::{SystemTime, UNIX_EPOCH};
-use relay_rust::db::{ACCESSSECRET, REFRESHSECRET, Claims};
+use relay_rust::db::{ACCESSSECRET, REFRESHSECRET, Claims, UserMongo};
 use juniper::futures::TryStreamExt;
 use base64::{decode, encode as encodeId};
 
@@ -239,6 +239,20 @@ pub struct SignInPayload {
   access_token: String,
 }
 
+#[derive(GraphQLInputObject)]
+struct SignUpInput {
+  password: String,
+  email: String,
+  username: String,
+}
+
+#[derive(GraphQLObject)]
+pub struct SignUpPayload {
+  error: String,
+  access_token: String,
+}
+
+
 pub struct Mutation;
 
 #[graphql_object(context = Context)]
@@ -269,6 +283,62 @@ impl Mutation {
     let mut new_cookie = context.new_cookie.write().await;
     *new_cookie = token_refresh;
     let result = SignInPayload {
+      error: "".to_owned(),
+      access_token: token_access,
+    };
+    Ok(Some(result))
+  }
+  async fn signUp<'a>(&self, input: SignUpInput, context: &'a Context) -> Result<Option<SignUpPayload>, FieldError> {
+    let email_input = &input.email;
+    let username_input = &input.username;
+    let filter = doc! { "$or": [{ "email": email_input.to_owned(), "username": username_input.to_owned() }] };
+    let user = context.users.find_one(filter, None).await?;
+    if user.is_some() {
+      let user_unwrapped = user.unwrap();
+      if user_unwrapped.email == email_input.to_owned() {
+        return Ok(Some(SignUpPayload {
+          error: "El email ya esta siendo usado.".to_owned(),
+          access_token: "".to_owned(),
+        }))
+      } else {
+        return Ok(Some(SignUpPayload {
+          error: "El username ya esta siendo usado.".to_owned(),
+          access_token: "".to_owned(),
+        }))
+      }
+    }
+    let hashed = hash(input.password, DEFAULT_COST)?;
+    let _id = ObjectId::new();
+    let new_doc = UserMongo {
+      _id: _id,
+      email: email_input.to_owned(),
+      password: hashed,
+      username: username_input.to_owned(),
+      default_technology_id: ObjectId::parse_str("3095f055f92be2001a15885a").unwrap(),
+   };
+    let insert_result = context.users.insert_one(new_doc, None).await?;
+    let key_access = ACCESSSECRET.as_bytes();
+    let key_refresh = REFRESHSECRET.as_bytes();
+    let start = SystemTime::now();
+    let since_the_epoch = start
+        .duration_since(UNIX_EPOCH)
+        .expect("Time went backwards")
+        .as_secs();
+    let my_claims_access =
+        Claims { _id: insert_result.inserted_id.as_str().unwrap().to_owned(), exp: (since_the_epoch + 900) as usize };
+    let token_access = match encode(&Header::default(), &my_claims_access, &EncodingKey::from_secret(key_access)) {
+        Ok(t) => t,
+        Err(_) => panic!(), // in practice you would return the error
+    };
+    let my_claims_refresh =
+        Claims { _id: insert_result.inserted_id.as_str().unwrap().to_owned(), exp: (since_the_epoch + 2592000) as usize };
+    let token_refresh = match encode(&Header::default(), &my_claims_refresh, &EncodingKey::from_secret(key_refresh)) {
+        Ok(t) => t,
+        Err(_) => panic!(), // in practice you would return the error
+    };
+    let mut new_cookie = context.new_cookie.write().await;
+    *new_cookie = token_refresh;
+    let result = SignUpPayload {
       error: "".to_owned(),
       access_token: token_access,
     };

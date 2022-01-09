@@ -48,9 +48,7 @@ export const SignUpMutation = mutationWithClientMutationId({
       if (user?.username === username)
         throw new Error("El username ya esta siendo usado.");
       const hash_password = await bcrypt.hash(password, 12);
-      const _id = new ObjectId();
-      await users.insertOne({
-        _id,
+      const result = await users.insertOne({
         email,
         password: hash_password,
         username,
@@ -58,14 +56,14 @@ export const SignUpMutation = mutationWithClientMutationId({
       });
       const refreshToken = jwt.sign(
         {
-          _id: _id.toHexString(),
+          _id: result.insertedId.toHexString(),
         },
         REFRESHSECRET,
         { expiresIn: "30 days" }
       );
       const accessToken = jwt.sign(
         {
-          _id: _id.toHexString(),
+          _id: result.insertedId.toHexString(),
         },
         ACCESSSECRET,
         { expiresIn: "15m" }
