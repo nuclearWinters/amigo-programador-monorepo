@@ -16,6 +16,9 @@ redis-db/**
 # production
 /build
 
+target/
+vendor/
+
 # misc
 .DS_Store
 .env.local

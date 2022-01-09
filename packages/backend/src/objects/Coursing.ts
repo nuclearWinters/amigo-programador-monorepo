@@ -2,7 +2,7 @@ import {
   GraphQLString,
   GraphQLNonNull,
   GraphQLObjectType,
-  GraphQLInt,
+  GraphQLBoolean,
 } from "graphql";
 import { globalIdField } from "graphql-relay";
 import { nodeInterface } from "../Nodes";
@@ -26,7 +26,7 @@ export const GraphQLCoursing = new GraphQLObjectType<CoursingMongo, Context>({
       resolve: ({ progress }): string => progress,
     },
     completed: {
-      type: new GraphQLNonNull(GraphQLInt),
+      type: new GraphQLNonNull(GraphQLBoolean),
       resolve: ({ completed }): boolean => completed,
     },
   },

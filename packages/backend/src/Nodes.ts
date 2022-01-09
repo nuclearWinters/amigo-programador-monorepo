@@ -199,7 +199,7 @@ export const GraphQLUser = new GraphQLObjectType<UserRoot, Context>({
           const results = await coursing
             .find({
               technology_id,
-              user_id: new ObjectId(_id),
+              user_id: _id,
             })
             .toArray();
           return results;

@@ -50,6 +50,7 @@ export type UserRoot = UserMongo & {
 };
 
 export interface TechnologyMongo {
+  _id: ObjectId;
   title: string;
   total: number;
   order: number;

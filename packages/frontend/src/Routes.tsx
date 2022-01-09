@@ -14,6 +14,10 @@ import { SignUp } from "./Pages/SignUp";
 import { SignIn } from "./Pages/SignIn";
 import { Routes_user$key } from "./__generated__/Routes_user.graphql";
 import { logOut } from "./utils";
+import { LoginButton } from "./Components/Button/LoginButton";
+import { SignUpButton } from "./Components/Button/SignUpButton";
+import { LogOutButton } from "./Components/Button/LogOutButton";
+import { LinkButton } from "./Components/Button/LinkButton";
 
 const routesFragment = graphql`
   fragment Routes_user on User {
@@ -42,37 +46,41 @@ export const Routes: FC<Props> = (props: Props) => {
     <Router>
       <div>
         <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/tech-tree">Tech Tree</Link>
-            </li>
-            <li>
-              <Link to={`/course`}>Continue</Link>
-            </li>
-            <li>
-              <Link to="/login">Log In</Link>
-            </li>
-            <li>
-              <Link to="/signup">Sign Up</Link>
-            </li>
-            <li
-              onClick={() => {
-                logOut();
-              }}
-            >
-              <Link to="/">Log Out</Link>
-            </li>
-          </ul>
+          <Link to="/home">
+            <LinkButton link="/home">Home</LinkButton>
+          </Link>
+          <Link to="/tech-tree">
+            <LinkButton link="/tech-tree">Tech Tree</LinkButton>
+          </Link>
+          <Link to={`/course`}>
+            <LinkButton link="/course">Continue</LinkButton>
+          </Link>
+          {data.username ? null : (
+            <>
+              <Link to="/login">
+                <LoginButton>Login</LoginButton>
+              </Link>
+              <Link to="/signup">
+                <SignUpButton>Sign Up</SignUpButton>
+              </Link>
+            </>
+          )}
+          {data.username ? (
+            <Link to="/">
+              <LogOutButton onClick={logOut}>Log Out</LogOutButton>
+            </Link>
+          ) : null}
         </nav>
         <BrowserRoutes>
           <Route path="/tech-tree" element={<TechTree data={data} />} />
+          <Route path="/" element={<Navigate to={`/home`} replace={true} />} />
           <Route
             path="/course"
             element={
-              <Navigate replace to={`/course/${data.default_technology_gid}`} />
+              <Navigate
+                to={`/course/${data.default_technology_gid}`}
+                replace={true}
+              />
             }
           />
           <Route
@@ -81,7 +89,7 @@ export const Routes: FC<Props> = (props: Props) => {
           />
           <Route path="/login" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
         </BrowserRoutes>
       </div>
     </Router>
