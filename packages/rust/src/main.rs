@@ -21,6 +21,10 @@ pub async fn post_graphql_handler_custom(response: actix_web::HttpResponse, new_
     let new_cookie = new_cookie_mut.read().await;
     let new_cookie_str = &*new_cookie;
     if !new_cookie_str.is_empty() {
+        if new_cookie_str == "delete" {
+            result.del_cookie("refreshToken");
+            return Ok(result);
+        }
         let start = SystemTime::now();
         let since_the_epoch = start
             .duration_since(UNIX_EPOCH)

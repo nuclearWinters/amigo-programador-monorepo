@@ -231,12 +231,14 @@ impl Query {
 struct SignInInput {
   password: String,
   email: String,
+  client_mutation_id: Option<String>,
 }
 
 #[derive(GraphQLObject)]
 pub struct SignInPayload {
   error: String,
   access_token: String,
+  client_mutation_id: Option<String>,
 }
 
 #[derive(GraphQLInputObject)]
@@ -244,14 +246,26 @@ struct SignUpInput {
   password: String,
   email: String,
   username: String,
+  client_mutation_id: Option<String>,
 }
 
 #[derive(GraphQLObject)]
 pub struct SignUpPayload {
   error: String,
   access_token: String,
+  client_mutation_id: Option<String>,
 }
 
+#[derive(GraphQLInputObject)]
+struct LogOutInput {
+  client_mutation_id: Option<String>,
+}
+
+#[derive(GraphQLObject)]
+pub struct LogOutPayload {
+  error: String,
+  client_mutation_id: Option<String>,
+}
 
 pub struct Mutation;
 
@@ -285,6 +299,7 @@ impl Mutation {
     let result = SignInPayload {
       error: "".to_owned(),
       access_token: token_access,
+      client_mutation_id: None,
     };
     Ok(Some(result))
   }
@@ -299,11 +314,13 @@ impl Mutation {
         return Ok(Some(SignUpPayload {
           error: "El email ya esta siendo usado.".to_owned(),
           access_token: "".to_owned(),
+          client_mutation_id: None,
         }))
       } else {
         return Ok(Some(SignUpPayload {
           error: "El username ya esta siendo usado.".to_owned(),
           access_token: "".to_owned(),
+          client_mutation_id: None,
         }))
       }
     }
@@ -341,8 +358,18 @@ impl Mutation {
     let result = SignUpPayload {
       error: "".to_owned(),
       access_token: token_access,
+      client_mutation_id: None,
     };
     Ok(Some(result))
+  }
+  async fn logOut<'a>(&self, _input: LogOutInput, context: &'a Context) -> Result<Option<LogOutPayload>, FieldError> {
+    let mut new_cookie = context.new_cookie.write().await;
+    *new_cookie = "delete".to_owned();
+    Ok(Some(
+      LogOutPayload {
+      error: "".to_owned(),
+      client_mutation_id: None,
+    }))
   }
 }
 
