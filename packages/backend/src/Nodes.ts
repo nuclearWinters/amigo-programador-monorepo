@@ -7,12 +7,12 @@ import {
   GraphQLID,
 } from "graphql";
 import { fromGlobalId, globalIdField, nodeDefinitions } from "graphql-relay";
-import { GraphQLComment } from "./objects/Comment";
+//import { GraphQLComment } from "./objects/Comment";
 import { GraphQLCoursed } from "./objects/Coursed";
 import { GraphQLCoursing } from "./objects/Coursing";
 import { GraphQLModule } from "./objects/Module";
 import { GraphQLPlaylist } from "./objects/Playlist";
-import { GraphQLReply } from "./objects/Reply";
+//import { GraphQLReply } from "./objects/Reply";
 import { GraphQLTechnology } from "./objects/Technologies";
 import {
   Context,
@@ -51,20 +51,7 @@ export const { nodeInterface, nodeField } = nodeDefinitions<Context>(
         return { type: "" };
     }
   },
-  (obj: { type: string }): GraphQLObjectType | null => {
-    switch (obj.type) {
-      case "Comment":
-        return GraphQLComment;
-      case "Reply":
-        return GraphQLReply;
-      case "Module":
-        return GraphQLModule;
-      case "User":
-        return GraphQLUser;
-      default:
-        return null;
-    }
-  }
+  (obj: { type: string }) => obj.type
 );
 
 export const GraphQLUser = new GraphQLObjectType<UserRoot, Context>({

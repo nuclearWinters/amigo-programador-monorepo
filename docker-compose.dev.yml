@@ -2,7 +2,7 @@ version: "3"
 services:
   backend:
     container_name: backend
-    image: node:14
+    image: node:16.13.1
     volumes:
       - .:/usr/src/service
     working_dir: /usr/src/service/packages/backend
@@ -14,7 +14,7 @@ services:
       - redis-courses
   frontend:
     container_name: frontend
-    image: node:14
+    image: node:16.13.1
     volumes:
       - .:/usr/src/service
     working_dir: /usr/src/service/packages/frontend

@@ -22,7 +22,7 @@ export interface Context {
 }
 
 export interface CoursedMongo {
-  _id: ObjectId;
+  _id?: ObjectId;
   technology_id: ObjectId;
   total: number;
   default_module_id: ObjectId;
@@ -38,7 +38,7 @@ export interface CoursedInput {
 }
 
 export interface UserMongo {
-  _id: ObjectId;
+  _id?: ObjectId;
   email: string;
   password: string;
   username: string;
@@ -50,7 +50,7 @@ export type UserRoot = UserMongo & {
 };
 
 export interface TechnologyMongo {
-  _id: ObjectId;
+  _id?: ObjectId;
   title: string;
   total: number;
   order: number;
@@ -58,7 +58,7 @@ export interface TechnologyMongo {
 }
 
 export interface PlaylistMongo {
-  _id: ObjectId;
+  _id?: ObjectId;
   title: string;
   thumbnail: string;
   duration: string;
@@ -68,14 +68,14 @@ export interface PlaylistMongo {
 }
 
 export interface ModuleMongo {
-  _id: ObjectId;
+  _id?: ObjectId;
   title: string;
   date: Date;
   description: string;
 }
 
 export interface CoursingMongo {
-  _id: ObjectId;
+  _id?: ObjectId;
   user_id: ObjectId;
   module_id: ObjectId;
   progress: string;
@@ -84,7 +84,7 @@ export interface CoursingMongo {
 }
 
 export interface CommentMongo {
-  _id: ObjectId;
+  _id?: ObjectId;
   module_id: ObjectId;
   likes: number;
   text: string;
@@ -95,7 +95,7 @@ export interface CommentMongo {
 }
 
 export interface ReplyMongo {
-  _id: ObjectId;
+  _id?: ObjectId;
   comment_id: ObjectId;
   likes: number;
   text: string;
@@ -106,7 +106,7 @@ export interface ReplyMongo {
 }
 
 export interface LikeMongo {
-  _id: ObjectId;
+  _id?: ObjectId;
   comment_id: ObjectId;
   user_id: ObjectId;
   status: boolean;
