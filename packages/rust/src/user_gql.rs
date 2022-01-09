@@ -57,12 +57,12 @@ impl User {
       name = "technology_gid",
       default = "",
     )]
-    technology_gid: juniper::ID, 
+    technology_gid: Option<juniper::ID>, 
     context: &'ctx Context
   ) -> Result<Vec<Playlist>, FieldError> {
     let technology_id: ObjectId;
-    if !technology_gid.is_empty() {
-      let gid = decode(technology_gid.to_string()).unwrap();
+    if technology_gid.is_some() {
+      let gid = decode(technology_gid.unwrap().to_string()).unwrap();
       let decoded = String::from_utf8(gid).unwrap();
       let split = decoded.split(":");
       let vec = split.collect::<Vec<&str>>();

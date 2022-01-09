@@ -56,12 +56,12 @@ impl Reply {
 
 #[derive(GraphQLObject)]
 pub struct ReplyEdge {
-  pub node: Reply,
+  pub node: Option<Reply>,
   pub cursor: String,
 }
 
 #[derive(GraphQLObject)]
 pub struct ReplyConnection {
   pub pageInfo: PageInfo,
-  pub edges: Vec<ReplyEdge>
+  pub edges: Option<Vec<Option<ReplyEdge>>>
 }

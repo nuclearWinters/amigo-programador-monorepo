@@ -144,8 +144,8 @@ where
 pub struct PageInfo {
   pub hasNextPage: bool,
   pub hasPreviousPage: bool,
-  pub startCursor: String,
-  pub endCursor: String,
+  pub startCursor: Option<String>,
+  pub endCursor: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

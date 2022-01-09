@@ -6,8 +6,8 @@ import {
 } from "graphql";
 import {
   Connection,
-  connectionArgs,
   ConnectionArguments,
+  forwardConnectionArgs,
   connectionDefinitions,
   connectionFromArray,
   globalIdField,
@@ -65,7 +65,7 @@ export const {
 export const comments = {
   type: new GraphQLNonNull(CommentConnection),
   args: {
-    ...connectionArgs,
+    ...forwardConnectionArgs,
   },
   resolve: async (
     { _id: module_id }: ModuleMongo,

@@ -7,10 +7,10 @@ import {
 } from "graphql";
 import {
   Connection,
-  connectionArgs,
   ConnectionArguments,
   connectionDefinitions,
   connectionFromArray,
+  forwardConnectionArgs,
   fromGlobalId,
   globalIdField,
 } from "graphql-relay";
@@ -64,7 +64,7 @@ export const replies = {
   type: new GraphQLNonNull(ReplyConnection),
   args: {
     comment_gid: { type: GraphQLID },
-    ...connectionArgs,
+    ...forwardConnectionArgs,
   },
   resolve: async (
     _root: unknown,
