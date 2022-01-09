@@ -1,6 +1,7 @@
-use juniper::{graphql_object};
+use juniper::{graphql_object, graphql_interface};
 use base64::{encode};
 use mongodb::{bson::{oid::ObjectId}};
+use crate::db::{Context};
 
 pub struct Coursing {
   pub _id: ObjectId,
@@ -11,7 +12,18 @@ pub struct Coursing {
   pub completed: bool,
 }
 
-#[graphql_object]
+#[graphql_interface(for = Coursing)]
+pub trait Node {
+  fn id<'ctx>(&self, context: &'ctx Context) -> juniper::ID;
+}
+
+impl Node for Coursing {
+  fn id<'ctx>(&self, _context: &'ctx Context) -> juniper::ID {
+    return juniper::ID::from("".to_owned());
+  }
+}
+
+#[graphql_object(context = Context, impl = NodeValue)]
 impl Coursing {
   fn id(&self) -> juniper::ID {
     let mut id: String = "Coursing:".to_owned();

@@ -1,4 +1,4 @@
-use juniper::{graphql_object, FieldError};
+use juniper::{graphql_object, FieldError, graphql_interface};
 use base64::{encode, decode};
 use mongodb::{bson::{oid::ObjectId, doc}, options::FindOptions};
 use mongodb::bson::DateTime;
@@ -18,7 +18,18 @@ pub struct Comment {
   pub updated_at: DateTime,
 }
 
-#[graphql_object(context = Context)]
+#[graphql_interface(for = Comment)]
+pub trait Node {
+  fn id<'ctx>(&self, context: &'ctx Context) -> juniper::ID;
+}
+
+impl Node for Comment {
+  fn id<'ctx>(&self, _context: &'ctx Context) -> juniper::ID {
+    return juniper::ID::from("".to_owned());
+  }
+}
+
+#[graphql_object(context = Context, impl = NodeValue)]
 impl Comment {
   fn id(&self) -> juniper::ID {
     let mut id: String = "Comment:".to_owned();
@@ -55,6 +66,13 @@ impl Comment {
   fn updated_at(&self) -> Date {
     return Date::new(self.updated_at);
   }
+  #[graphql(
+    arguments(
+      comment_gid(
+        name = "comment_gid"
+      ),
+    ),
+  )]
   async fn replies<'ctx>(
     &self, 
     after: Option<String>,

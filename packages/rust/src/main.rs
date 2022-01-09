@@ -1,6 +1,3 @@
-//! Actix web juniper example
-//!
-//! A simple example integrating juniper in actix-web
 use std::io;
 use actix_cors::Cors;
 use actix_web::{
@@ -63,8 +60,12 @@ fn get_access_token<'a>(req: &'a HttpRequest) -> Option<String> {
 }
 
 fn get_refresh_token<'a>(req: &'a HttpRequest) -> Option<String> {
-    let strin_refresh = req.cookie("refreshToken").unwrap().to_string();
-    return Some(strin_refresh);
+    let mut result: Option<String> = Some("".to_owned());
+    let refresh_token = req.cookie("refreshToken");
+    if refresh_token.is_some() {
+        result = Some(refresh_token.unwrap().value().to_owned());
+    }
+    return result;
 }
 
 async fn graphql(
@@ -100,10 +101,8 @@ async fn main() -> io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
 
-    // Parse a connection string into an options struct.
     let client_options = ClientOptions::parse(MONGO_DB).await.expect("ClientOptions failed!");
 
-    // Get a handle to the deployment.
     let client = Client::with_options(client_options).expect("with_options failed!");
 
     let db = client.database("courses");

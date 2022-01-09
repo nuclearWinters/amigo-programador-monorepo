@@ -1,4 +1,4 @@
-use juniper::{graphql_object, FieldError};
+use juniper::{graphql_object, FieldError, graphql_interface};
 use base64::{encode, decode};
 use mongodb::{bson::{doc, oid::ObjectId}, options::FindOptions};
 use crate::db::{Context};
@@ -15,7 +15,18 @@ pub struct Module {
   pub description: String,
 }
 
-#[graphql_object(context = Context)]
+#[graphql_interface(for = Module)]
+pub trait Node {
+  fn id<'ctx>(&self, context: &'ctx Context) -> juniper::ID;
+}
+
+impl Node for Module {
+  fn id<'ctx>(&self, _context: &'ctx Context) -> juniper::ID {
+    return juniper::ID::from("".to_owned());
+  }
+}
+
+#[graphql_object(context = Context, impl = NodeValue)]
 impl Module {
   fn id(&self) -> juniper::ID {
     let mut id: String = "Module:".to_owned();

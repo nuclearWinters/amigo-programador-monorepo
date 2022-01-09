@@ -12,18 +12,6 @@ services:
     depends_on:
       - mongo-courses
       - redis-courses
-  backend:
-    container_name: backend
-    image: node:14
-    volumes:
-      - .:/usr/src/service
-    working_dir: /usr/src/service/packages/backend
-    command: ["npm", "run", "start"]
-    ports:
-      - "4000:4000"
-    depends_on:
-      - mongo-courses
-      - redis-courses
   frontend:
     container_name: frontend
     image: node:14

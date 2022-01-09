@@ -1,6 +1,7 @@
-use juniper::{graphql_object};
+use juniper::{graphql_object, graphql_interface};
 use base64::{encode};
 use mongodb::{bson::{oid::ObjectId}};
+use crate::db::{Context};
 
 pub struct Playlist {
   pub _id: ObjectId,
@@ -12,7 +13,18 @@ pub struct Playlist {
   pub module_id: ObjectId,
 }
 
-#[graphql_object]
+#[graphql_interface(for = Playlist)]
+pub trait Node {
+  fn id<'ctx>(&self, context: &'ctx Context) -> juniper::ID;
+}
+
+impl Node for Playlist {
+  fn id<'ctx>(&self, _context: &'ctx Context) -> juniper::ID {
+    return juniper::ID::from("".to_owned());
+  }
+}
+
+#[graphql_object(context = Context, impl = NodeValue)]
 impl Playlist {
   fn id(&self) -> juniper::ID {
     let mut id: String = "Playlist:".to_owned();
@@ -32,13 +44,13 @@ impl Playlist {
     return self.order;
   }
   #[graphql(name = "technology_gid")]
-  fn technology_id(&self) -> juniper::ID {
+  fn technology_gid(&self) -> juniper::ID {
     let mut id: String = "Technology:".to_owned();
     id.push_str(&self.technology_id.to_hex());
     return juniper::ID::from(encode(id));
   }
   #[graphql(name = "module_gid")]
-  fn module_id(&self) -> juniper::ID {
+  fn module_gid(&self) -> juniper::ID {
     let mut id: String = "Module:".to_owned();
     id.push_str(&self.module_id.to_hex());
     return juniper::ID::from(encode(id));

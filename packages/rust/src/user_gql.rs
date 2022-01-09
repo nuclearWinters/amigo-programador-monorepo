@@ -1,4 +1,4 @@
-use juniper::{graphql_object, FieldError};
+use juniper::{graphql_object, FieldError, graphql_interface};
 use crate::db::{Context};
 use crate::objects::technologies::Technology;
 use crate::objects::playlists::Playlist;
@@ -17,7 +17,18 @@ pub struct User {
   pub coursed: Vec<Coursed>
 }
 
-#[graphql_object(context = Context)]
+#[graphql_interface(for = User)]
+pub trait Node {
+  fn id<'ctx>(&self, context: &'ctx Context) -> juniper::ID;
+}
+
+impl Node for User {
+  fn id<'ctx>(&self, _context: &'ctx Context) -> juniper::ID {
+    return juniper::ID::from("".to_owned());
+  }
+}
+
+#[graphql_object(context = Context, impl = NodeValue)]
 impl User {
   fn id(&self) -> juniper::ID {
     let mut id: String = "User:".to_owned();
@@ -30,8 +41,8 @@ impl User {
   fn username(&self) -> &str {
     self.username.as_str()
   }
-  #[graphql(name = "default_technology_id")]
-  fn default_technology_id(&self) -> juniper::ID {
+  #[graphql(name = "default_technology_gid")]
+  fn default_technology_gid(&self) -> juniper::ID {
     let mut id: String = "Technology:".to_owned();
     id.push_str(&self.default_technology_id.to_hex());
     juniper::ID::from(encode(id))
@@ -51,12 +62,15 @@ impl User {
     }
     Ok(result)
   }
+  #[graphql(
+    arguments(
+      technology_gid(
+        name = "technology_gid"
+      ),
+    ),
+  )]
   async fn playlist<'ctx>(
     &self, 
-    #[graphql(
-      name = "technology_gid",
-      default = "",
-    )]
     technology_gid: Option<juniper::ID>, 
     context: &'ctx Context
   ) -> Result<Vec<Playlist>, FieldError> {
@@ -89,12 +103,15 @@ impl User {
     }
     Ok(result)
   }
+  #[graphql(
+    arguments(
+      technology_gid(
+        name = "technology_gid"
+      ),
+    ),
+  )]
   async fn coursing<'ctx>(
     &self,
-    #[graphql(
-      name = "technology_gid",
-      default = "",
-    )]
     technology_gid: Option<juniper::ID>,
     context: &'ctx Context
   ) -> Result<Vec<Coursing>, FieldError> {
@@ -141,12 +158,15 @@ impl User {
     }
     Ok(result)
   }
+  #[graphql(
+    arguments(
+      module_gid(
+        name = "module_gid"
+      ),
+    ),
+  )]
   async fn module<'ctx>(
     &self,
-    #[graphql(
-      name = "module_gid",
-      default = "",
-    )]
     module_gid: Option<juniper::ID>,
     context: &'ctx Context
   ) -> Result<Module, FieldError> {

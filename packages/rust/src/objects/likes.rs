@@ -1,8 +1,8 @@
-use juniper::{graphql_object};
+use juniper::{graphql_object, graphql_interface};
 use base64::{encode};
 use mongodb::{bson::{oid::ObjectId}};
 use mongodb::bson::DateTime;
-use crate::db::{Date};
+use crate::db::{Date, Context};
 
 pub struct Like {
   pub _id: ObjectId,
@@ -13,7 +13,18 @@ pub struct Like {
   pub updated_at: DateTime,
 }
 
-#[graphql_object]
+#[graphql_interface(for = Like)]
+pub trait Node {
+  fn id<'ctx>(&self, context: &'ctx Context) -> juniper::ID;
+}
+
+impl Node for Like {
+  fn id<'ctx>(&self, _context: &'ctx Context) -> juniper::ID {
+    return juniper::ID::from("".to_owned());
+  }
+}
+
+#[graphql_object(context = Context, impl = NodeValue)]
 impl Like {
   fn id(&self) -> juniper::ID {
     let mut id: String = "Like:".to_owned();

@@ -1,8 +1,9 @@
-use juniper::{graphql_object, GraphQLObject};
+use juniper::{graphql_object, graphql_interface};
 use base64::{encode};
 use mongodb::{bson::{oid::ObjectId}};
 use mongodb::bson::DateTime;
 use crate::db::{Date, PageInfo};
+use crate::db::{Context};
 
 pub struct Reply {
   pub _id: ObjectId,
@@ -15,7 +16,18 @@ pub struct Reply {
   pub updated_at: DateTime,
 }
 
-#[graphql_object]
+#[graphql_interface(for = Reply)]
+pub trait Node {
+  fn id<'ctx>(&self, context: &'ctx Context) -> juniper::ID;
+}
+
+impl Node for Reply {
+  fn id<'ctx>(&self, _context: &'ctx Context) -> juniper::ID {
+    return juniper::ID::from("".to_owned());
+  }
+}
+
+#[graphql_object(context = Context, impl = NodeValue)]
 impl Reply {
   fn id(&self) -> juniper::ID {
     let mut id: String = "Reply:".to_owned();
@@ -54,14 +66,32 @@ impl Reply {
   }
 }
 
-#[derive(GraphQLObject)]
 pub struct ReplyEdge {
   pub node: Option<Reply>,
   pub cursor: String,
 }
 
-#[derive(GraphQLObject)]
+#[graphql_object(context = Context)]
+impl ReplyEdge {
+  fn node(&self) -> &Option<Reply> {
+    return &self.node;
+  }
+  fn cursor(&self) -> &str {
+    return &self.cursor;
+  }
+}
+
 pub struct ReplyConnection {
   pub page_info: PageInfo,
   pub edges: Option<Vec<Option<ReplyEdge>>>
+}
+
+#[graphql_object(context = Context)]
+impl ReplyConnection {
+  fn page_info(&self) -> &PageInfo {
+    return &self.page_info;
+  }
+  fn edges(&self) -> &Option<Vec<Option<ReplyEdge>>> {
+    return &self.edges;
+  }
 }
