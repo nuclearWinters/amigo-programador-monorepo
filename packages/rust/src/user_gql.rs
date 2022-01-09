@@ -14,6 +14,7 @@ pub struct User {
   pub email: String,
   pub username: String,
   pub default_technology_id: ObjectId,
+  pub coursed: Vec<Coursed>
 }
 
 #[graphql_object(context = Context)]
@@ -94,13 +95,13 @@ impl User {
       name = "technology_gid",
       default = "",
     )]
-    technology_gid: juniper::ID,
+    technology_gid: Option<juniper::ID>,
     context: &'ctx Context
   ) -> Result<Vec<Coursing>, FieldError> {
     let mut result: Vec<Coursing> = Vec::new();
     let technology_id: ObjectId;
-    if !technology_gid.is_empty() {
-      let gid = decode(technology_gid.to_string()).unwrap();
+    if technology_gid.is_some() {
+      let gid = decode(technology_gid.unwrap().to_string()).unwrap();
       let decoded = String::from_utf8(gid).unwrap();
       let split = decoded.split(":");
       let vec = split.collect::<Vec<&str>>();
@@ -112,15 +113,15 @@ impl User {
     let filter = doc! { "technology_id": technology_id, "user_id": self._id  };
     let mut cursor = context.coursing.find(filter, None).await?;
     while let Some(coursing) = cursor.try_next().await? {
-        let coursing_graphql = Coursing {
-          _id: coursing._id,
-          module_id: coursing.module_id,
-          user_id: coursing.user_id,
-          technology_id: coursing.technology_id,
-          progress: coursing.progress,
-          completed: coursing.completed
-        };
-        result.push(coursing_graphql);
+      let coursing_graphql = Coursing {
+        _id: coursing._id,
+        module_id: coursing.module_id,
+        user_id: coursing.user_id,
+        technology_id: coursing.technology_id,
+        progress: coursing.progress,
+        completed: coursing.completed
+      };
+      result.push(coursing_graphql);
     }
     Ok(result)
   }
@@ -129,13 +130,14 @@ impl User {
     let filter = doc! { "user_id": self._id  };
     let mut cursor = context.coursed.find(filter, None).await?;
     while let Some(coursed) = cursor.try_next().await? {
-        let coursed_graphql = Coursed {
-          _id: coursed._id,
-          total: coursed.total,
-          default_module_id: coursed.default_module_id,
-          user_id: coursed.user_id,
-        };
-        result.push(coursed_graphql);
+      let coursed_graphql = Coursed {
+        _id: coursed._id,
+        technology_id: coursed.technology_id,
+        total: coursed.total,
+        default_module_id: coursed.default_module_id,
+        user_id: coursed.user_id,
+      };
+      result.push(coursed_graphql);
     }
     Ok(result)
   }
@@ -145,10 +147,27 @@ impl User {
       name = "module_gid",
       default = "",
     )]
-    module_gid: juniper::ID,
+    module_gid: Option<juniper::ID>,
     context: &'ctx Context
   ) -> Result<Module, FieldError> {
-    let filter = doc! { "_id": ObjectId::parse_str("3095f055f92be2001a15885a").unwrap() };
+    let mut module_id = ObjectId::parse_str("000000000000000000000000").unwrap();
+    if module_gid.is_some() {
+      let gid = decode(module_gid.unwrap().to_string()).unwrap();
+      let decoded = String::from_utf8(gid).unwrap();
+      let split = decoded.split(":");
+      let vec = split.collect::<Vec<&str>>();
+      let oid = ObjectId::parse_str(vec[1]).unwrap();
+      module_id = oid;
+    } else {
+      let iter = self.coursed.iter();
+      let default_technology_id = self.default_technology_id.to_hex();
+      for coursed in iter {
+        if coursed.technology_id.to_hex() == default_technology_id {
+          module_id = coursed.default_module_id;
+        }
+      }      
+    }
+    let filter = doc! { "_id": module_id };
     let module = context.modules.find_one(filter, None).await?.expect("Missing 'Module' document.");
     let module_graphql = Module {
       _id: module._id,

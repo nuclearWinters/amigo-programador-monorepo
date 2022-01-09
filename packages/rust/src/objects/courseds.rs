@@ -4,6 +4,7 @@ use mongodb::{bson::{oid::ObjectId}};
 
 pub struct Coursed {
   pub _id: ObjectId,
+  pub technology_id: ObjectId,
   pub total: i32,
   pub default_module_id: ObjectId,
   pub user_id: ObjectId,
@@ -12,8 +13,14 @@ pub struct Coursed {
 #[graphql_object]
 impl Coursed {
   fn id(&self) -> juniper::ID {
-    let mut id: String = "Coursing:".to_owned();
+    let mut id: String = "Coursed:".to_owned();
     id.push_str(&self._id.to_hex());
+    return juniper::ID::from(encode(id));
+  }
+  #[graphql(name = "technology_gid")]
+  fn technology_gid(&self) -> juniper::ID {
+    let mut id: String = "Technology:".to_owned();
+    id.push_str(&self.technology_id.to_hex());
     return juniper::ID::from(encode(id));
   }
   fn total(&self) -> i32 {
