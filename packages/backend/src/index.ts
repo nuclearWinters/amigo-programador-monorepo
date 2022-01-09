@@ -11,6 +11,7 @@ MongoClient.connect(MONGO_DB).then(async (client) => {
   await client.connect();
   const db = client.db("courses");
   app.locals.db = db;
+  await redisClient.connect();
   app.locals.rdb = redisClient;
   app.listen(process.env.PORT || 4000);
 });
