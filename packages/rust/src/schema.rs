@@ -9,7 +9,7 @@ use relay_rust::objects::replies::{Reply, ReplyEdge};
 use relay_rust::objects::likes::Like;
 use relay_rust::objects::playlists::Playlist;
 use relay_rust::objects::coursings::Coursing;
-use mongodb::{bson::{doc, DateTime, oid::ObjectId}};
+use mongodb::{bson::{doc, DateTime, oid::ObjectId}, options::{FindOneAndUpdateOptions, ReturnDocument}};
 use bcrypt::{verify, hash, DEFAULT_COST};
 use jsonwebtoken::{encode, Header, EncodingKey};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -335,6 +335,38 @@ impl AddReplyPayload {
   }
 }
 
+#[derive(GraphQLInputObject)]
+struct UpdateDefaultModuleInput {
+  #[graphql(name="module_gid")]
+  module_gid: juniper::ID,
+  #[graphql(name="technology_gid")]
+  technology_gid: juniper::ID,
+  client_mutation_id: Option<String>,
+}
+
+pub struct UpdateDefaultModulePayload {
+  error: String,
+  access_token: String,
+  coursed_module: Option<Coursed>,
+  client_mutation_id: Option<String>,
+}
+
+#[graphql_object(context =  Context)]
+impl UpdateDefaultModulePayload {
+  fn error(&self) -> &str {
+    return &self.error;
+  }
+  fn access_token(&self) -> &str {
+    return &self.access_token;
+  }
+  fn coursed_module(&self) -> &Option<Coursed> {
+    return &self.coursed_module;
+  }
+  fn client_mutation_id(&self) -> &Option<String> {
+    return &self.client_mutation_id;
+  }
+}
+
 pub struct Mutation;
 
 #[graphql_object(context = Context)]
@@ -442,19 +474,10 @@ impl Mutation {
   async fn addComment<'a>(&self, input: AddCommentInput, context: &'a Context) -> Result<Option<AddCommentPayload>, FieldError> {
     let valid_access_token = &context.valid_access_token;
     let user_oid = &context.user_oid;
-    if context.valid_access_token.is_empty() {
+    if context.valid_access_token.is_empty() || context.user_oid.is_empty() {
       return Ok(Some(
         AddCommentPayload {
-        error: "".to_owned(),
-        access_token: valid_access_token.to_owned(),
-        comment_edge: None,
-        client_mutation_id: None,
-      }))
-    }
-    if context.user_oid.is_empty() {
-      return Ok(Some(
-        AddCommentPayload {
-        error: "".to_owned(),
+        error: "No logged user.".to_owned(),
         access_token: valid_access_token.to_owned(),
         comment_edge: None,
         client_mutation_id: None,
@@ -509,19 +532,10 @@ impl Mutation {
   async fn addReply<'a>(&self, input: AddReplyInput, context: &'a Context) -> Result<Option<AddReplyPayload>, FieldError> {
     let valid_access_token = &context.valid_access_token;
     let user_oid = &context.user_oid;
-    if context.valid_access_token.is_empty() {
+    if context.valid_access_token.is_empty() || context.user_oid.is_empty() {
       return Ok(Some(
         AddReplyPayload {
-        error: "".to_owned(),
-        access_token: valid_access_token.to_owned(),
-        reply_edge: None,
-        client_mutation_id: None,
-      }))
-    }
-    if context.user_oid.is_empty() {
-      return Ok(Some(
-        AddReplyPayload {
-        error: "".to_owned(),
+        error: "No logged user.".to_owned(),
         access_token: valid_access_token.to_owned(),
         reply_edge: None,
         client_mutation_id: None,
@@ -572,6 +586,54 @@ impl Mutation {
       }),
       client_mutation_id: None,
     }))
+  }
+  async fn updateDefaultModule<'a>(&self, input: UpdateDefaultModuleInput, context: &'a Context) -> Result<Option<UpdateDefaultModulePayload>, FieldError> {
+    let user_oid_str = &context.user_oid;
+    if context.valid_access_token.is_empty() || context.user_oid.is_empty() {
+      return Ok(Some(
+        UpdateDefaultModulePayload {
+          access_token: "".to_owned(),
+          error: "No logged user.".to_owned(),
+          coursed_module: None,
+          client_mutation_id: None,
+        }
+      ));
+    }
+    let user_oid = ObjectId::parse_str(user_oid_str.to_owned()).unwrap();
+
+    let gid_module = decode(input.module_gid.to_string()).unwrap();
+    let decoded_module = String::from_utf8(gid_module).unwrap();
+    let split_module = decoded_module.split(":");
+    let vec_module = split_module.collect::<Vec<&str>>();
+    let module_oid = ObjectId::parse_str(vec_module[1]).unwrap();
+
+    let gid_technology = decode(input.technology_gid.to_string()).unwrap();
+    let decoded_technology = String::from_utf8(gid_technology).unwrap();
+    let split_technology = decoded_technology.split(":");
+    let vec_technology = split_technology.collect::<Vec<&str>>();
+    let technology_oid = ObjectId::parse_str(vec_technology[1]).unwrap();
+
+    let filter = doc! { "user_id": user_oid, "technology_id": technology_oid };
+    let update = doc! { "$set": { "default_module_id": module_oid }, "$setOnInsert": { "user_id": user_oid, "technology_id": technology_oid, "total": 0 } };
+    let find_options = FindOneAndUpdateOptions::builder().upsert(true).return_document(ReturnDocument::After).build();
+    let result = context.coursed.find_one_and_update(filter, update, find_options).await?;
+    let coursed = result.unwrap();
+    Ok(Some(
+      UpdateDefaultModulePayload {
+        access_token: "".to_owned(),
+        error: "".to_owned(),
+        coursed_module: Some(
+          Coursed {
+            _id: coursed._id,
+            technology_id: coursed.technology_id,
+            total: coursed.total,
+            default_module_id: coursed.default_module_id,
+            user_id: coursed.user_id,
+          }
+        ),
+        client_mutation_id: None,
+      }
+    ))
   }
 }
 

@@ -5,7 +5,6 @@ import { ObjectId } from "mongodb";
 import { GraphQLCoursed } from "../objects/Coursed";
 
 interface Input {
-  user_gid: string;
   module_gid: string;
   technology_gid: string;
 }
@@ -21,7 +20,6 @@ export const UpdateDefaultModuleMutation = mutationWithClientMutationId({
   description:
     "Actualiza el modulo que el usuario vera por defecto cuando revise una tecnología.",
   inputFields: {
-    user_gid: { type: new GraphQLNonNull(GraphQLID) },
     module_gid: { type: new GraphQLNonNull(GraphQLID) },
     technology_gid: { type: new GraphQLNonNull(GraphQLID) },
   },
@@ -41,32 +39,12 @@ export const UpdateDefaultModuleMutation = mutationWithClientMutationId({
     },
   },
   mutateAndGetPayload: async (
-    { user_gid, module_gid, technology_gid }: Input,
+    { module_gid, technology_gid }: Input,
     { user_oid, validAccessToken, coursed }: Context
   ): Promise<Payload> => {
     try {
-      if (!validAccessToken) {
+      if (!validAccessToken || !user_oid) {
         throw new Error("No logged user.");
-      }
-      if (!user_oid) {
-        throw new Error("No logged user.");
-      }
-      if (user_gid === "VXNlcjowMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA") {
-        return {
-          accessToken: "",
-          error: "",
-          coursedModule: {
-            _id: new ObjectId("000000000000000000000003"),
-            technology_id: new ObjectId("1095f055f92be2001a15885a"),
-            total: 0,
-            default_module_id: new ObjectId("3095f055f92be2001a15885a"),
-            user_id: new ObjectId("7095f055f92be2001a15885a"),
-          },
-        };
-      }
-      const { id: user_id } = fromGlobalId(user_gid);
-      if (user_id !== user_oid.toHexString()) {
-        throw new Error("No es el mismo usuario.");
       }
       const { id: module_id } = fromGlobalId(module_gid);
       const { id: technology_id } = fromGlobalId(technology_gid);

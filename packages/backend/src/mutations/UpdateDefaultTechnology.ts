@@ -5,7 +5,6 @@ import { ObjectId } from "mongodb";
 import { GraphQLUser } from "../Nodes";
 
 interface Input {
-  user_gid: string;
   technology_gid: string;
 }
 
@@ -20,7 +19,6 @@ export const UpdateDefaultTechnologyMutation = mutationWithClientMutationId({
   description:
     "Actualiza la tecnología que el usuario vera por defecto cuando revise su curso.",
   inputFields: {
-    user_gid: { type: new GraphQLNonNull(GraphQLID) },
     technology_gid: { type: new GraphQLNonNull(GraphQLID) },
   },
   outputFields: {
@@ -38,32 +36,12 @@ export const UpdateDefaultTechnologyMutation = mutationWithClientMutationId({
     },
   },
   mutateAndGetPayload: async (
-    { user_gid, technology_gid }: Input,
+    { technology_gid }: Input,
     { user_oid, validAccessToken, users }: Context
   ): Promise<Payload> => {
     try {
-      if (!validAccessToken) {
+      if (!validAccessToken || !user_oid) {
         throw new Error("No logged user.");
-      }
-      if (!user_oid) {
-        throw new Error("No logged user.");
-      }
-      if (user_gid === "VXNlcjowMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA") {
-        return {
-          accessToken: "",
-          error: "",
-          user: {
-            _id: new ObjectId("000000000000000000000000"),
-            email: "",
-            password: "",
-            username: "",
-            default_technology_id: new ObjectId("1095f055f92be2001a15885a"),
-          },
-        };
-      }
-      const { id: user_id } = fromGlobalId(user_gid);
-      if (user_id !== user_oid.toHexString()) {
-        throw new Error("No es el mismo usuario.");
       }
       const { id: technology_id } = fromGlobalId(technology_gid);
       const technology_oid = new ObjectId(technology_id);
