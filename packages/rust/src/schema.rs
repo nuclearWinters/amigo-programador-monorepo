@@ -367,6 +367,36 @@ impl UpdateDefaultModulePayload {
   }
 }
 
+#[derive(GraphQLInputObject)]
+struct UpdateDefaultTechnologyInput {
+  #[graphql(name="technology_gid")]
+  technology_gid: juniper::ID,
+  client_mutation_id: Option<String>,
+}
+
+pub struct UpdateDefaultTechnologyPayload {
+  error: String,
+  access_token: String,
+  user: Option<User>,
+  client_mutation_id: Option<String>,
+}
+
+#[graphql_object(context =  Context)]
+impl UpdateDefaultTechnologyPayload {
+  fn error(&self) -> &str {
+    return &self.error;
+  }
+  fn access_token(&self) -> &str {
+    return &self.access_token;
+  }
+  fn user(&self) -> &Option<User> {
+    return &self.user;
+  }
+  fn client_mutation_id(&self) -> &Option<String> {
+    return &self.client_mutation_id;
+  }
+}
+
 pub struct Mutation;
 
 #[graphql_object(context = Context)]
@@ -629,6 +659,49 @@ impl Mutation {
             total: coursed.total,
             default_module_id: coursed.default_module_id,
             user_id: coursed.user_id,
+          }
+        ),
+        client_mutation_id: None,
+      }
+    ))
+  }
+  async fn updateDefaultTechnology<'a>(&self, input: UpdateDefaultTechnologyInput, context: &'a Context) -> Result<Option<UpdateDefaultTechnologyPayload>, FieldError> {
+    let user_oid_str = &context.user_oid;
+    if context.valid_access_token.is_empty() || context.user_oid.is_empty() {
+      return Ok(Some(
+        UpdateDefaultTechnologyPayload {
+          access_token: "".to_owned(),
+          error: "No logged user.".to_owned(),
+          user: None,
+          client_mutation_id: None,
+        }
+      ));
+    }
+    let user_oid = ObjectId::parse_str(user_oid_str.to_owned()).unwrap();
+
+    let gid_technology = decode(input.technology_gid.to_string()).unwrap();
+    let decoded_technology = String::from_utf8(gid_technology).unwrap();
+    let split_technology = decoded_technology.split(":");
+    let vec_technology = split_technology.collect::<Vec<&str>>();
+    let technology_oid = ObjectId::parse_str(vec_technology[1]).unwrap();
+
+    let filter = doc! { "user_id": user_oid };
+    let update = doc! { "$set": { "default_module_id": technology_oid } };
+    let find_options = FindOneAndUpdateOptions::builder().return_document(ReturnDocument::After).build();
+    let result = context.users.find_one_and_update(filter, update, find_options).await?;
+    let user = result.unwrap();
+    let coursed: Vec<Coursed> = Vec::new();
+    Ok(Some(
+      UpdateDefaultTechnologyPayload {
+        access_token: "".to_owned(),
+        error: "".to_owned(),
+        user: Some(
+          User {
+            _id: user._id,
+            email: user.email,
+            username: user.username,
+            default_technology_id: user.default_technology_id,
+            coursed: coursed,
           }
         ),
         client_mutation_id: None,
