@@ -1,15 +1,15 @@
 use juniper::{EmptySubscription, RootNode, FieldError, graphql_object, GraphQLObject, GraphQLInputObject, graphql_interface};
-use relay_rust::db::{Context};
+use relay_rust::db::{Context, CommentMongo, ReplyMongo};
 use relay_rust::user_gql::User;
 use relay_rust::objects::modules::Module;
 use relay_rust::objects::courseds::Coursed;
 use relay_rust::objects::technologies::Technology;
-use relay_rust::objects::comments::Comment;
-use relay_rust::objects::replies::Reply;
+use relay_rust::objects::comments::{Comment, CommentEdge};
+use relay_rust::objects::replies::{Reply, ReplyEdge};
 use relay_rust::objects::likes::Like;
 use relay_rust::objects::playlists::Playlist;
 use relay_rust::objects::coursings::Coursing;
-use mongodb::{bson::{doc, oid::ObjectId}};
+use mongodb::{bson::{doc, DateTime, oid::ObjectId}};
 use bcrypt::{verify, hash, DEFAULT_COST};
 use jsonwebtoken::{encode, Header, EncodingKey};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -267,6 +267,74 @@ pub struct LogOutPayload {
   client_mutation_id: Option<String>,
 }
 
+#[derive(GraphQLInputObject)]
+struct AddCommentInput {
+  comment: String,
+  #[graphql(name="module_gid")]
+  module_gid: juniper::ID,
+  #[graphql(name="user_username")]
+  user_username: String,
+  client_mutation_id: Option<String>,
+}
+
+pub struct AddCommentPayload {
+  pub error: String,
+  pub access_token: String,
+  pub comment_edge: Option<CommentEdge>,
+  pub client_mutation_id: Option<String>,
+}
+
+#[graphql_object(context =  Context)]
+impl AddCommentPayload {
+  fn error(&self) -> &str {
+    return &self.error;
+  }
+  fn access_token(&self) -> &str {
+    return &self.access_token;
+  }
+  #[graphql(name = "comment_edge")]
+  fn comment_edge(&self) -> &Option<CommentEdge> {
+    return &self.comment_edge;
+  }
+  fn client_mutation_id(&self) -> &Option<String> {
+    return &self.client_mutation_id;
+  }
+}
+
+#[derive(GraphQLInputObject)]
+struct AddReplyInput {
+  comment: String,
+  #[graphql(name="comment_gid")]
+  comment_gid: juniper::ID,
+  #[graphql(name="user_username")]
+  user_username: String,
+  client_mutation_id: Option<String>,
+}
+
+pub struct AddReplyPayload {
+  pub error: String,
+  pub access_token: String,
+  pub reply_edge: Option<ReplyEdge>,
+  pub client_mutation_id: Option<String>,
+}
+
+#[graphql_object(context =  Context)]
+impl AddReplyPayload {
+  fn error(&self) -> &str {
+    return &self.error;
+  }
+  fn access_token(&self) -> &str {
+    return &self.access_token;
+  }
+  #[graphql(name = "reply_edge")]
+  fn reply_edge(&self) -> &Option<ReplyEdge> {
+    return &self.reply_edge;
+  }
+  fn client_mutation_id(&self) -> &Option<String> {
+    return &self.client_mutation_id;
+  }
+}
+
 pub struct Mutation;
 
 #[graphql_object(context = Context)]
@@ -368,6 +436,140 @@ impl Mutation {
     Ok(Some(
       LogOutPayload {
       error: "".to_owned(),
+      client_mutation_id: None,
+    }))
+  }
+  async fn addComment<'a>(&self, input: AddCommentInput, context: &'a Context) -> Result<Option<AddCommentPayload>, FieldError> {
+    let valid_access_token = &context.valid_access_token;
+    let user_oid = &context.user_oid;
+    if context.valid_access_token.is_empty() {
+      return Ok(Some(
+        AddCommentPayload {
+        error: "".to_owned(),
+        access_token: valid_access_token.to_owned(),
+        comment_edge: None,
+        client_mutation_id: None,
+      }))
+    }
+    if context.user_oid.is_empty() {
+      return Ok(Some(
+        AddCommentPayload {
+        error: "".to_owned(),
+        access_token: valid_access_token.to_owned(),
+        comment_edge: None,
+        client_mutation_id: None,
+      }))
+    }
+    let user_username = &input.user_username;
+    let comment = &input.comment;
+    let date = DateTime::now();
+    let gid = decode(input.module_gid.to_string()).unwrap();
+    let decoded = String::from_utf8(gid).unwrap();
+    let split = decoded.split(":");
+    let vec = split.collect::<Vec<&str>>();
+    let module_oid = ObjectId::parse_str(vec[1]).unwrap();
+    let user_oid = ObjectId::parse_str(user_oid).unwrap();
+    let comment_oid = ObjectId::new();
+    let new_doc = CommentMongo {
+      _id: comment_oid,
+      text: comment.to_owned(),
+      user_id: user_oid,
+      user_username: user_username.to_owned(),
+      module_id: module_oid,
+      created_at: date,
+      updated_at: date,
+      likes: 0
+   };
+    let insert_result = context.comments.insert_one(new_doc, None).await?;
+    let mut id: String = "arrayconnection:".to_owned();
+    id.push_str(insert_result.inserted_id.as_str().unwrap());
+    let cursor = encodeId(id);
+    Ok(Some(
+      AddCommentPayload {
+      error: "".to_owned(),
+      access_token: valid_access_token.to_owned(),
+      comment_edge: Some(CommentEdge {
+        node: Some(
+          Comment {
+            _id: comment_oid,
+            likes: 0,
+            module_id: module_oid,
+            text: comment.to_owned(),
+            user_id: user_oid,
+            user_username: user_username.to_owned(),
+            created_at: date,
+            updated_at: date,
+          }
+        ),
+        cursor: cursor,
+      }),
+      client_mutation_id: None,
+    }))
+  }
+  async fn addReply<'a>(&self, input: AddReplyInput, context: &'a Context) -> Result<Option<AddReplyPayload>, FieldError> {
+    let valid_access_token = &context.valid_access_token;
+    let user_oid = &context.user_oid;
+    if context.valid_access_token.is_empty() {
+      return Ok(Some(
+        AddReplyPayload {
+        error: "".to_owned(),
+        access_token: valid_access_token.to_owned(),
+        reply_edge: None,
+        client_mutation_id: None,
+      }))
+    }
+    if context.user_oid.is_empty() {
+      return Ok(Some(
+        AddReplyPayload {
+        error: "".to_owned(),
+        access_token: valid_access_token.to_owned(),
+        reply_edge: None,
+        client_mutation_id: None,
+      }))
+    }
+    let user_username = &input.user_username;
+    let comment = &input.comment;
+    let date = DateTime::now();
+    let gid = decode(input.comment_gid.to_string()).unwrap();
+    let decoded = String::from_utf8(gid).unwrap();
+    let split = decoded.split(":");
+    let vec = split.collect::<Vec<&str>>();
+    let module_oid = ObjectId::parse_str(vec[1]).unwrap();
+    let user_oid = ObjectId::parse_str(user_oid).unwrap();
+    let comment_oid = ObjectId::new();
+    let new_doc = ReplyMongo {
+      _id: comment_oid,
+      text: comment.to_owned(),
+      user_id: user_oid,
+      user_username: user_username.to_owned(),
+      comment_id: module_oid,
+      created_at: date,
+      updated_at: date,
+      likes: 0
+   };
+    let insert_result = context.replies.insert_one(new_doc, None).await?;
+    let mut id: String = "arrayconnection:".to_owned();
+    id.push_str(insert_result.inserted_id.as_str().unwrap());
+    let cursor = encodeId(id);
+    Ok(Some(
+      AddReplyPayload {
+      error: "".to_owned(),
+      access_token: valid_access_token.to_owned(),
+      reply_edge: Some(ReplyEdge {
+        node: Some(
+          Reply {
+            _id: comment_oid,
+            likes: 0,
+            comment_id: module_oid,
+            text: comment.to_owned(),
+            user_id: user_oid,
+            user_username: user_username.to_owned(),
+            created_at: date,
+            updated_at: date,
+          }
+        ),
+        cursor: cursor,
+      }),
       client_mutation_id: None,
     }))
   }
