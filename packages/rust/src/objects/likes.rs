@@ -31,14 +31,14 @@ impl Like {
     id.push_str(&self._id.to_hex());
     return juniper::ID::from(encode(id));
   }
-  #[graphql(name = "comment_id")]
-  fn comment_id(&self) -> juniper::ID {
+  #[graphql(name = "comment_gid")]
+  fn comment_gid(&self) -> juniper::ID {
     let mut id: String = "Comment:".to_owned();
     id.push_str(&self._id.to_hex());
     return juniper::ID::from(encode(id));
   }
-  #[graphql(name = "user_id")]
-  fn user_id(&self) -> juniper::ID {
+  #[graphql(name = "user_gid")]
+  fn user_gid(&self) -> juniper::ID {
     let mut id: String = "User:".to_owned();
     id.push_str(&self._id.to_hex());
     return juniper::ID::from(encode(id));
