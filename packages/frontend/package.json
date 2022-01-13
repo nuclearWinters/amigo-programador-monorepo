@@ -33,7 +33,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "relay": "relay-compiler --customScalars.Date=Int --language typescript --src ./src --schema ./src/schema.graphql --extensions ts tsx",
+    "relay": "relay-compiler",
     "serve": "",
     "pcm": "lint-staged"
   },
@@ -73,5 +73,13 @@
       "prettier --write",
       "cross-env CI=true react-scripts test --env=jsdom --findRelatedTests --bail"
     ]
+  },
+  "relay": {
+    "src": "./src",
+    "schema": "./src/schema.graphql",
+    "customScalars": {
+      "Date": "Int"
+    },
+    "language": "typescript"
   }
 }
