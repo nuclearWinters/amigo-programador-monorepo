@@ -4,8 +4,9 @@ services:
     container_name: backend
     image: node:16.13.1
     volumes:
-      - .:/usr/src/service
-    working_dir: /usr/src/service/packages/backend
+      - node_modules_backend:/usr/src/service/node_modules
+      - ./packages/backend:/usr/src/service
+    working_dir: /usr/src/service
     command: ["npm", "run", "start"]
     ports:
       - "4000:4000"
@@ -16,8 +17,9 @@ services:
     container_name: frontend
     image: node:16.13.1
     volumes:
-      - .:/usr/src/service
-    working_dir: /usr/src/service/packages/frontend
+      - node_modules_frontend:/usr/src/service/node_modules
+      - ./packages/frontend:/usr/src/service
+    working_dir: /usr/src/service
     command: ["npm", "run", "start"]
     ports:
       - "3000:3000"
@@ -39,3 +41,8 @@ services:
       - "6379:6379"
     volumes:
       - ./redis-db:/data
+volumes:
+  node_modules_backend:
+    external: true
+  node_modules_frontend:
+    external: true

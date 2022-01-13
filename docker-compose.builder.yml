@@ -1,0 +1,30 @@
+version: "3"
+
+x-backend-base: &backend
+  image: node:16.13.1
+  volumes:
+    - node_modules_backend:/usr/src/service/node_modules
+    - ./packages/backend:/usr/src/service/
+  working_dir: /usr/src/service/
+
+x-frontend-base: &frontend
+  image: node:16.13.1
+  volumes:
+    - node_modules_frontend:/usr/src/service/node_modules
+    - ./packages/frontend:/usr/src/service/
+  working_dir: /usr/src/service/
+
+services:
+  install_backend:
+    <<: *backend
+    command: npm i
+
+  install_frontend:
+    <<: *frontend
+    command: npm i
+
+volumes:
+  node_modules_backend:
+    external: true
+  node_modules_frontend:
+    external: true
