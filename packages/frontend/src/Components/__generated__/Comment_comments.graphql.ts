@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<495a504728b2f54fd191219c1b0f3d2d>>
+ * @generated SignedSource<<bbe472e09e646cbbca07bc19281faed6>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,8 +17,8 @@ export type Comment_comments$data = {
   readonly text: string;
   readonly user_gid: string;
   readonly user_username: string;
-  readonly created_at: Int | null;
-  readonly updated_at: Int | null;
+  readonly created_at: Int;
+  readonly updated_at: Int;
   readonly " $fragmentSpreads": FragmentRefs<"Replies_query">;
   readonly " $fragmentType": "Comment_comments";
 };

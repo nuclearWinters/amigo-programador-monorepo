@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c73eb6d19ce594e4afd335e4a1909bcc>>
+ * @generated SignedSource<<0dfc669f181924e8e0876f93d4906d05>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -33,8 +33,8 @@ export type CoursingAddCommentMutation$data = {
         readonly text: string;
         readonly user_gid: string;
         readonly user_username: string;
-        readonly created_at: Int | null;
-        readonly updated_at: Int | null;
+        readonly created_at: Int;
+        readonly updated_at: Int;
       } | null;
     } | null;
     readonly accessToken: string;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<32cdc5621746e0b4285ade7cb64e2815>>
+ * @generated SignedSource<<d539a61d8f28d4b12b8b4f8a7a30f361>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -17,8 +17,8 @@ export type Reply_replies$data = {
   readonly text: string;
   readonly user_gid: string;
   readonly user_username: string;
-  readonly created_at: Int | null;
-  readonly updated_at: Int | null;
+  readonly created_at: Int;
+  readonly updated_at: Int;
   readonly " $fragmentType": "Reply_replies";
 };
 export type Reply_replies = Reply_replies$data;

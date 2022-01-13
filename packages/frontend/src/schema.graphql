@@ -137,8 +137,8 @@ type Comment implements Node {
   text: String!
   user_gid: ID!
   user_username: String!
-  created_at: Date
-  updated_at: Date
+  created_at: Date!
+  updated_at: Date!
   replies(after: String, first: Int, before: String, last: Int): ReplyConnection
 }
 
@@ -203,8 +203,8 @@ type Reply implements Node {
   text: String!
   user_gid: ID!
   user_username: String!
-  created_at: Date
-  updated_at: Date
+  created_at: Date!
+  updated_at: Date!
 }
 
 type ReplyConnection {

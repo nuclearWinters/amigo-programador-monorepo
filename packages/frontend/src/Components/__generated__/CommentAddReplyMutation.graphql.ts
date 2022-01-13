@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<459dd7df82aa099bef625179be694455>>
+ * @generated SignedSource<<8a8e9727f5cbcd2206f29372bdfbe208>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -33,8 +33,8 @@ export type CommentAddReplyMutation$data = {
         readonly text: string;
         readonly user_gid: string;
         readonly user_username: string;
-        readonly created_at: Int | null;
-        readonly updated_at: Int | null;
+        readonly created_at: Int;
+        readonly updated_at: Int;
       } | null;
     } | null;
     readonly accessToken: string;
