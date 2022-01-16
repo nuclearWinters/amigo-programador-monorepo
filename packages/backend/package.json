@@ -9,7 +9,7 @@
     "build": "npx tsc",
     "serve": "node ./build/index.js",
     "pcm": "lint-staged",
-    "test": "jest --bail"
+    "test": "jest --bail --runTestsByPath ./src/mutations/*test.ts"
   },
   "author": "Armando Rueda",
   "license": "ISC",
@@ -64,6 +64,19 @@
     ],
     "testMatch": [
       "<rootDir>/src/**/*.test.ts"
+    ]
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ],
+      "@babel/preset-typescript"
     ]
   }
 }
