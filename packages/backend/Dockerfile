@@ -4,6 +4,8 @@ RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash 
 
 WORKDIR /app
 
+COPY ./node_modules ./node_modules
+
 COPY . .
 
 RUN npm run build
