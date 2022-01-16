@@ -18,6 +18,7 @@ phases:
     commands:
       - echo Running tests...
       - npm run test
+      - ls
       - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
