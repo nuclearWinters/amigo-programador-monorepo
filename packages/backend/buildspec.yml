@@ -11,6 +11,7 @@ phases:
       - npm ci
   build:
     commands:
+      - ls
       - echo Running tests...
       - npm run test
   post_build:
