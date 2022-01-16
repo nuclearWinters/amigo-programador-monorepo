@@ -8,7 +8,7 @@ phases:
     commands:
       - echo Installing source NPM dependencies...
       - cd packages/backend
-      - npm install
+      - npm ci
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com

@@ -4,10 +4,6 @@ RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash 
 
 WORKDIR /app
 
-COPY ["package.json", "package-lock.json*", "./"]
-
-RUN npm install
-
 COPY . .
 
 RUN npm run build
