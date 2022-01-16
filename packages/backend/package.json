@@ -56,5 +56,14 @@
       "prettier --write",
       "jest --findRelatedTests --bail"
     ]
+  },
+  "jest": {
+    "preset": "@shelf/jest-mongodb",
+    "modulePathIgnorePatterns": [
+      "build/"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/*.test.ts"
+    ]
   }
 }
