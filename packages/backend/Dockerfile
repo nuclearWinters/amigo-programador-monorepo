@@ -1,19 +1,29 @@
-FROM node:16.13.1
+FROM node:16 AS BUILD_IMAGE
 
-ENV NODE_ENV=production
-ENV MONGO_DB=mongodb+srv://nuclearWinters:armando123@cluster0.krz20.mongodb.net/auth?retryWrites=true&w=majority
-ENV REFRESHSECRET=ampauthrefresh
-ENV ACCESSSECRET=ampauthaccess
-ENV REDIS=redis://redis-auth.mc7gdz.0001.use2.cache.amazonaws.com:6379
+RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
 
-WORKDIR /usr/src/service
+WORKDIR /app
 
 COPY ["package.json", "package-lock.json*", "./"]
 
-RUN npm install --production
+RUN npm install
 
 COPY . .
 
 RUN npm run build
+
+RUN npm prune --production
+
+RUN /usr/local/bin/node-prune
+
+FROM node:16-alpine
+
+ENV NODE_ENV=production
+
+WORKDIR /app
+
+# copy from build image
+COPY --from=BUILD_IMAGE /app/build ./build
+COPY --from=BUILD_IMAGE /app/node_modules ./node_modules
 
 CMD [ "npm", "run", "serve" ]
