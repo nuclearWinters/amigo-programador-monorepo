@@ -8,7 +8,6 @@ phases:
     commands:
       - echo Installing source NPM dependencies...
       - cd packages/backend
-      - npm install
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
@@ -16,8 +15,6 @@ phases:
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
     commands:
-      - echo Running tests...
-      - npm run test
       - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .

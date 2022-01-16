@@ -1,12 +1,16 @@
-FROM node:16 AS BUILD_IMAGE
+FROM node:14 AS BUILD_IMAGE
 
 RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
 
 WORKDIR /app
 
+COPY ["package.json", "package-lock.json*", "./"]
+
+RUN npm install
+
 COPY . .
 
-ADD ./node_modules ./node_modules
+RUN npm run test
 
 RUN npm run build
 
