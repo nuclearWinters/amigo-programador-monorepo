@@ -1,5 +1,5 @@
 {
-  "name": "backend-auth",
+  "name": "backend-node-amp",
   "version": "1.0.1",
   "description": "Backend typescript express relay mongodb",
   "main": "index.ts",
