@@ -1,15 +1,15 @@
-import { fromGlobalId, mutationWithClientMutationId } from "graphql-relay";
+import { /*fromGlobalId,*/ mutationWithClientMutationId } from "graphql-relay";
 import { GraphQLString, GraphQLNonNull, GraphQLID } from "graphql";
-import { Context, UserMongo } from "../types";
-import { ObjectId } from "mongodb";
-import { refreshTokenMiddleware } from "../utils";
+import { /*Context,*/ UserMongo } from "../types";
+//import { ObjectId } from "mongodb";
+//import { refreshTokenMiddleware } from "../utils";
 import { GraphQLUser } from "../Nodes";
 
-interface Input {
+/*interface Input {
   user_gid: string;
   username: string;
   email: string;
-}
+}*/
 
 type Payload = {
   validAccessToken: string;
@@ -40,12 +40,11 @@ export const UpdateUserMutation = mutationWithClientMutationId({
       resolve: ({ user }: Payload): UserMongo | null => user,
     },
   },
-  mutateAndGetPayload: async (
-    { user_gid, ...user }: Input,
-    { users, accessToken, refreshToken }: Context
-  ): Promise<Payload> => {
+  mutateAndGetPayload: async (): /*{ user_gid, ...user }: Input,
+    { users accessToken, refreshToken }: Context*/
+  Promise<Payload> => {
     try {
-      const { id: user_id } = fromGlobalId(user_gid);
+      /*const { id: user_id } = fromGlobalId(user_gid);
       const { _id, validAccessToken } = await refreshTokenMiddleware(
         accessToken,
         refreshToken
@@ -68,6 +67,11 @@ export const UpdateUserMutation = mutationWithClientMutationId({
           ...userResult,
           _id: _id_user,
         },
+      };*/
+      return {
+        validAccessToken: "",
+        error: "",
+        user: null,
       };
     } catch (e) {
       return {
