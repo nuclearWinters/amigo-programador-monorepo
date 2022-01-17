@@ -57,6 +57,10 @@ export const { nodeInterface, nodeField } = nodeDefinitions<Context>(
 export const GraphQLUser = new GraphQLObjectType<UserRoot, Context>({
   name: "User",
   fields: {
+    test: {
+      type: new GraphQLNonNull(GraphQLString),
+      resolve: (): string => "test1",
+    },
     id: globalIdField("User", ({ _id }): string => _id.toHexString()),
     username: {
       type: new GraphQLNonNull(GraphQLString),
