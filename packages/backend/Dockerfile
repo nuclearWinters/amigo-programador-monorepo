@@ -28,4 +28,4 @@ WORKDIR /app
 COPY --from=BUILD_IMAGE /app/build ./build
 COPY --from=BUILD_IMAGE /app/node_modules ./node_modules
 
-CMD [ "npm", "run", "serve" ]
+CMD [ "node", "./build/index.js" ]
