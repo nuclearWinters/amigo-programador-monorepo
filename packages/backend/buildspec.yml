@@ -28,7 +28,7 @@ phases:
       - echo Writing image definitions file...
       - printf '[{"name":"amigo-programador-node","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
-  files: imagedefinitions.json
+  files: packages/backend/imagedefinitions.json
 cache:
   paths:
     - "packages/backend/node_modules/**/*"
