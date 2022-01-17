@@ -26,10 +26,12 @@ phases:
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
-      - cat imagedefinitions.json
+      - cd ..
+      - cd ..
       - printf '[{"name":"amigo-programador-node","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - cat imagedefinitions.json
 artifacts:
-  files: packages/backend/imagedefinitions.json
+  files: imagedefinitions.json
 cache:
   paths:
     - "packages/backend/node_modules/**/*"
