@@ -28,7 +28,7 @@ phases:
       - echo Writing image definitions file...
       - cd ..
       - cd ..
-      - printf '[{"name":"amigo-programador-node","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"backend-node-amp-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - cat imagedefinitions.json
 artifacts:
   files: imagedefinitions.json
