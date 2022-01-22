@@ -55,6 +55,10 @@ app.use(
   })
 );
 
+app.use("/", (req, res) => {
+  res.send("Server running!");
+});
+
 app.use(
   "/graphql",
   graphqlHTTP((req, res) => {
