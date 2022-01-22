@@ -2,7 +2,7 @@ import { mutationWithClientMutationId } from "graphql-relay";
 import { GraphQLString, GraphQLNonNull } from "graphql";
 import { ACCESSSECRET, REFRESHSECRET } from "../config";
 import { Context } from "../types";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 import { jwt } from "../utils";
 import { addDays } from "date-fns";
