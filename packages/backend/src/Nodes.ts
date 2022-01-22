@@ -59,7 +59,7 @@ export const GraphQLUser = new GraphQLObjectType<UserRoot, Context>({
   fields: {
     test: {
       type: new GraphQLNonNull(GraphQLString),
-      resolve: (): string => "test1",
+      resolve: (): string => "test2",
     },
     id: globalIdField("User", ({ _id }): string => _id.toHexString()),
     username: {
