@@ -1,4 +1,4 @@
-FROM node:14 AS BUILD_IMAGE
+FROM node:14-alpine AS BUILD_IMAGE
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY /node_modules ./node_modules
 
 RUN npm prune --production
 
-FROM node:16-alpine
+FROM node:14-alpine
 
 ENV NODE_ENV=production
 
