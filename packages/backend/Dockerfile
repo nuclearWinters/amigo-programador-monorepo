@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm prune --production
+RUN npm prune --production --force
 
 FROM node:16-alpine
 
