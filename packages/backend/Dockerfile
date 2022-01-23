@@ -8,7 +8,7 @@ COPY /build ./build
 
 COPY /node_modules ./node_modules
 
-RUN npm prune --production
+RUN npm prune --production --force
 
 FROM node:14-alpine
 
