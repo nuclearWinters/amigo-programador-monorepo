@@ -2,9 +2,13 @@ FROM node:14 AS BUILD_IMAGE
 
 WORKDIR /app
 
-COPY . .
+COPY package.json package-lock.json .
 
-RUN npm prune --production --force
+COPY ./node_modules ./node_modules
+
+COPY ./build ./build
+
+RUN npm prune --production
 
 FROM node:16-alpine
 
