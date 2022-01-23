@@ -4,9 +4,9 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 
-COPY /node_modules ./node_modules
-
 COPY /build ./build
+
+COPY /node_modules ./node_modules
 
 RUN npm prune --production
 
