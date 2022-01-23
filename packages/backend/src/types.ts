@@ -1,6 +1,8 @@
 import { CookieOptions } from "express";
 import { ObjectId, Collection } from "mongodb";
-import { RedisClientType } from "@node-redis/client/dist/lib/client";
+import { createClient } from "redis";
+
+type RedisClientType = ReturnType<typeof createClient>;
 
 export interface Context {
   users: Collection<UserMongo>;
