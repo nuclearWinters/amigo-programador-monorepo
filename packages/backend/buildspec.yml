@@ -1,10 +1,14 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      nodejs: 14
   pre_build:
     commands:
       - echo Installing source NPM dependencies...
       - cd packages/backend
+      - npm install
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
@@ -13,8 +17,12 @@ phases:
   build:
     commands:
       - echo Build started on `date`
+      - echo Running tests...
+      - npm run test
+      - echo Running build...
+      - npm run build
       - echo Building the Docker image...
-      - docker build --build-arg MONGO_DB --build-arg REFRESHSECRET --build-arg ACCESSSECRET --build-arg REDIS -t $REPOSITORY_URI:latest .
+      - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
