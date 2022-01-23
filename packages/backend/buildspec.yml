@@ -37,8 +37,3 @@ phases:
       - cat imagedefinitions.json
 artifacts:
   files: imagedefinitions.json
-cache:
-  paths:
-    - "/root/.m2/**/*"
-    - "/root/.npm/**/*"
-    - "packages/backend/node_modules/**/*"
