@@ -424,15 +424,15 @@ export const Coursing: FC<Props> = (props) => {
 };
 
 const {
-  tarea,
-  instruciones,
-  tareaContainer,
-  totalComentarios,
+  //tarea,
+  //instruciones,
+  //tareaContainer,
+  //totalComentarios,
   linea,
   descripcionVideo,
   comentariosContainer,
   bottomVideoContainer,
-  modo,
+  //modo,
   title,
   headerPlayList,
   playlistContainer,
