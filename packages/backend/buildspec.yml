@@ -7,9 +7,7 @@ phases:
   pre_build:
     commands:
       - echo Installing source NPM dependencies...
-      - cat .dockerignore
       - cd packages/backend
-      - cat .dockerignore
       - npm install
       - echo Logging in to Amazon ECR...
       - aws --version
