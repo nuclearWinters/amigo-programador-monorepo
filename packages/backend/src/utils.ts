@@ -17,7 +17,9 @@ import { DecodeJWT } from "./types";
 import { GraphQLScalarType, Kind } from "graphql";
 import { CookieOptions } from "express";
 import { ObjectId } from "bson";
-import { RedisClientType } from "@node-redis/client/dist/lib/client";
+import { createClient } from "redis";
+
+type RedisClientType = ReturnType<typeof createClient>;
 
 export const jwt = {
   decode: (token: string): string | DecodeJWT | null => {
