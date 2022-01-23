@@ -2,7 +2,7 @@ FROM node:14 AS BUILD_IMAGE
 
 WORKDIR /app
 
-COPY package.json package-lock.json /.
+COPY package.json package-lock.json ./
 
 COPY ./node_modules ./node_modules
 
